@@ -8,7 +8,10 @@ A sample project to test Docker Swarm and blue-green deployment model
 Execute `docker node update --label-add environment=green` on one machine and `docker node update --label-add environment=blue` on the other, in order to differentiate the environments and make sure deployments are split correctly between the two
 
 ## Deploy the stack
-`docker stack deploy --compose-file docker-stack.yml swarm-test`
+Run `docker stack deploy --compose-file docker-stack.yml swarm-test`
+You will have the following endpoints:
+- node_ip:8080 - Visualization of the Swarm deployment
+- node_ip:80 - Load balancer
 
 ## How to test the deployment and load balancing switch
 If you run the `request.sh` on one of the nodes, you will have the following result:
