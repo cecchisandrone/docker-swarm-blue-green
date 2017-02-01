@@ -1,0 +1,42 @@
+version: '3'
+services:
+  swarm-lb:
+    image: cecchisandrone/swarm-lb:0.0.1
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'" 
+    environment:
+    - ACTIVE_BACKEND=swarm-backend-green
+    - BACKUP_BACKEND=swarm-backend-blue
+    replicas: 2
+    ports:
+    - 80:80
+  swarm-backend-green:
+    image: cecchisandrone/swarm-backend:0.0.1
+    environment:
+    - ENVIRONMENT=GREEN
+    ports:
+    - 4000    
+    deploy:
+      placement:
+        constraints: [node.labels.environment == green]
+  swarm-backend-blue:
+    image: cecchisandrone/swarm-backend:0.0.1
+    environment:
+    - ENVIRONMENT=BLUE
+    ports:
+    - 4000    
+    deploy:
+      placement:
+        constraints: [node.labels.environment == blue]
+  visualizer:
+    image: manomarks/visualizer
+    ports:
+    - "8080:8080"
+    #stop_grace_period: 1m30s
+    volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  debug:
+    image: busybox
+    command: ping swarm-backend-blue

@@ -1,0 +1,10 @@
+server {
+   listen 80;
+   location / {
+      proxy_pass http://swarm-backend;
+   }
+}
+upstream swarm-backend {
+   server ${ACTIVE_BACKEND}:4000;
+   server ${BACKUP_BACKEND}:4000 backup;
+}
