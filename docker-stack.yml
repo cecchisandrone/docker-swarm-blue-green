@@ -44,3 +44,47 @@ services:
   debug:
     image: busybox
     command: ping swarm-backend-blue
+  galera1:
+    image: erkules/galera:basic
+    command: --wsrep-cluster-address=gcomm:// --wsrep-new-cluster
+    hostname: galera1
+    environment:
+    - MYSQL_DATABASE=db
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=user
+    - MYSQL_PASSWORD=password
+    ports:
+    - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.hostname == default]
+  galera2:
+    image: erkules/galera:basic
+    command: --wsrep-cluster-address=gcomm://galera1
+    hostname: galera2
+    ports:
+    - "3308:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.hostname == swarm-1]
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+  galera3:
+    image: erkules/galera:basic
+    command: --wsrep-cluster-address=gcomm://galera1
+    hostname: galera3
+    ports:
+    - "3309:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    deploy:
+      placement:
+        constraints: [node.hostname == swarm-2] 
+      restart_policy:
+        condition: on-failure
+        delay: 10s

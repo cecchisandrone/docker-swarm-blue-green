@@ -1,8 +1,8 @@
 # docker-swarm-blue-green
-A sample project to test Docker Swarm and blue-green deployment model
+A sample project to test Docker Swarm and blue-green deployment model plus a load balanced MySQL Galera cluster
 
 ## Prerequisites
-- A Docker Swarm setup with at least two machines
+- A Docker Swarm setup with at least three machines
 
 ## Setup green and blue machine
 Execute `docker node update --label-add environment=green` on one machine and `docker node update --label-add environment=blue` on the other, in order to differentiate the environments and make sure deployments are split correctly between the two
@@ -46,3 +46,10 @@ Request number: 7 served by abd5896fd6fe - BLUE
 ````
 
 Obviously there is a timeframe in which both blue and green are receiving requests. This because I set parallelism to one in `docker-stack.yml`, in order to avoid losing requests.
+
+## How to test the MySQL Galera cluster
+You can connect to one of the three Galera containers using a MySQL client on ports 3307,3308,3309 or using the load balancer on port 3306.
+Running the following statement will show you which container you are connected to:
+````
+SHOW VARIABLES WHERE Variable_name = 'hostname';
+```` 
