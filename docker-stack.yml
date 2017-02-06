@@ -88,3 +88,6 @@ services:
       restart_policy:
         condition: on-failure
         delay: 10s
+volumes:
+  db-data:
+  
